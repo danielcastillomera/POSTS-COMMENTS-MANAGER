@@ -1,44 +1,44 @@
-# Accessibility
+# Accesibilidad
 
-## Standards
+## Estandar de referencia
 
-This application targets WCAG 2.1 Level AA compliance.
+Esta aplicacion tiene como objetivo el cumplimiento del nivel AA de las pautas WCAG 2.1.
 
-## Practices Applied
+## Practicas aplicadas
 
-### Semantic HTML
+### HTML semantico
 
-- Pages use `<article>`, `<section>`, `<header>`, `<main>`, and `<nav>` elements.
-- Headings follow a logical hierarchy (h1 > h2 > h3).
+- Las paginas usan elementos `<article>`, `<section>`, `<header>`, `<main>` y `<nav>`.
+- Los encabezados siguen una jerarquia logica (h1 > h2 > h3).
 
-### ARIA Attributes
+### Atributos ARIA
 
-- Buttons that toggle state include `aria-expanded`.
-- Form inputs are linked to labels via `id` / `for`.
-- Invalid inputs include `aria-invalid="true"`.
-- The toast container uses `aria-live="assertive"` and `aria-atomic="true"`.
-- The loading spinner uses `role="status"` and `aria-live="polite"`.
-- Icon-only buttons include `aria-label`.
+- Los botones que alternan un estado incluyen `aria-expanded`.
+- Los campos de formulario estan vinculados a sus etiquetas mediante `id` y `for`.
+- Los campos invalidos incluyen `aria-invalid="true"`.
+- El contenedor de notificaciones tipo toast usa `aria-live="assertive"` y `aria-atomic="true"`.
+- El indicador de carga usa `role="status"` y `aria-live="polite"`.
+- Los botones que contienen solo iconos incluyen `aria-label`.
 
-### Keyboard Navigation
+### Navegacion por teclado
 
-- All interactive elements are reachable and operable via keyboard.
-- Focus is managed correctly when modals or dropdowns open and close.
-- The language switcher dropdown closes on Escape (via `ClickOutsideDirective`).
+- Todos los elementos interactivos son accesibles y operables mediante teclado.
+- El foco se gestiona correctamente al abrir y cerrar menus desplegables.
+- El selector de idioma se cierra con la directiva `ClickOutsideDirective`.
 
-### Color Contrast
+### Contraste de color
 
-- Text on white backgrounds meets a minimum contrast ratio of 4.5:1.
-- Interactive states (hover, focus) are visually distinct.
-- Error states use both color (red) and iconography to convey state.
+- El texto sobre fondos blancos cumple una relacion de contraste minima de 4.5:1.
+- Los estados interactivos (hover, focus) son visualmente distinguibles.
+- Los estados de error usan tanto color (rojo) como iconografia para comunicar el estado.
 
-### Responsive Design
+### Diseno responsivo
 
-- Layout adapts from 320px (small phone) to 4K displays.
-- Touch targets meet the minimum 44x44px guideline on mobile.
-- The navigation collapses to a hamburger menu on screens below 768px.
+- La interfaz se adapta desde 320px (telefono pequeño) hasta pantallas de 4K.
+- Los objetivos tactiles cumplen el minimo de 44x44px en dispositivos moviles.
+- La navegacion colapsa en un menu hamburguesa en pantallas menores a 768px.
 
-## Known Limitations
+## Limitaciones conocidas
 
-- The language switcher flags (emoji) may not render consistently across all operating systems.
-- Screen reader announcements for dynamic content updates depend on the `aria-live` region in the toast component.
+- Los emojis de bandera en el selector de idioma pueden no renderizarse de forma consistente en todos los sistemas operativos.
+- Los anuncios de lector de pantalla para actualizaciones dinamicas dependen de la region `aria-live` en el componente de notificaciones toast.

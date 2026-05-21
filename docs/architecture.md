@@ -1,79 +1,78 @@
-# Architecture Overview
+# Arquitectura del sistema
 
-## System Architecture
+## Vision general
 
-The application follows a client-server architecture with clear separation of concerns between the frontend and backend layers.
+La aplicacion sigue una arquitectura cliente-servidor con separacion clara de responsabilidades entre el frontend y el backend.
 
 ```
-Browser (Angular SPA)
-       |
-       | HTTP/REST (JSON)
-       |
-NestJS API (port 3000)
-       |
-       | Mongoose ODM
-       |
-MongoDB (port 27017)
+Navegador (Angular SPA)
+        |
+        | HTTP/REST (JSON)
+        |
+API NestJS (puerto 3000)
+        |
+        | Mongoose ODM
+        |
+MongoDB (puerto 27017)
 ```
 
-## Backend Architecture
+## Arquitectura del backend
 
-The NestJS backend follows a modular, layered architecture:
+El backend en NestJS sigue una arquitectura modular por capas:
 
 ```
 src/
-  app.module.ts          - Root module, wires dependencies
-  main.ts                - Bootstrap, global pipes and filters
+  app.module.ts          - Modulo raiz, conecta dependencias
+  main.ts                - Bootstrap, pipes y filtros globales
   posts/
-    posts.module.ts      - Feature module
-    posts.controller.ts  - Route handlers, HTTP layer
-    posts.service.ts     - Business logic
-    dto/                 - Data Transfer Objects with validation
-    schemas/             - Mongoose document schemas
-  comments/              - Same structure as posts
+    posts.module.ts      - Modulo de la funcionalidad
+    posts.controller.ts  - Manejadores de rutas, capa HTTP
+    posts.service.ts     - Logica de negocio
+    dto/                 - Objetos de transferencia de datos con validacion
+    schemas/             - Esquemas de documentos Mongoose
+  comments/              - Misma estructura que posts
   common/
-    filters/             - Global exception filter
-    interceptors/        - Response transformation
-    responses/           - ApiResponse utility
+    filters/             - Filtro global de excepciones
+    interceptors/        - Transformacion de respuestas
+    responses/           - Clase utilitaria ApiResponse
 ```
 
-### Design Decisions
+### Decisiones de diseno
 
-- **Global Exception Filter** catches all unhandled errors and normalizes responses to `{ success, message, status }`.
-- **ResponseInterceptor** wraps successful responses that are not already in API format.
-- **ValidationPipe** is global with `whitelist: true` to strip unknown properties and prevent injection.
-- The `POST /posts/bulk` route is declared **before** `GET /posts/:id` in the controller to prevent routing conflicts.
+- El **filtro global de excepciones** captura todos los errores no controlados y normaliza las respuestas al formato `{ success, message, status }`.
+- El **ResponseInterceptor** envuelve las respuestas exitosas que no estan en formato API.
+- El **ValidationPipe** es global con `whitelist: true` para eliminar propiedades desconocidas y prevenir inyecciones.
+- La ruta `POST /posts/bulk` se declara **antes** de `GET /posts/:id` en el controlador para evitar conflictos de enrutamiento.
 
-## Frontend Architecture
+## Arquitectura del frontend
 
-The Angular frontend uses standalone components organized by feature:
+El frontend Angular usa componentes independientes organizados por funcionalidad:
 
 ```
 src/app/
   core/
-    interceptors/        - HTTP error interceptor (functional)
+    interceptors/        - Interceptor HTTP de errores (funcional)
     services/            - I18nService, ErrorService
-    utils/               - Error mapper
+    utils/               - Mapeador de errores
   shared/
-    components/          - Reusable UI components
+    components/          - Componentes de interfaz reutilizables
     pipes/               - TranslatePipe
     directives/          - ClickOutsideDirective
   features/
     posts/
-      pages/             - Routed page components
-      components/        - Feature-specific dumb components
+      pages/             - Componentes de pagina con enrutamiento
+      components/        - Componentes presentacionales de la funcionalidad
       services/          - PostsService, CommentsService
-      models/            - TypeScript interfaces
-  app.config.ts          - Root application configuration
-  app.routes.ts          - Lazy-loaded route definitions
+      models/            - Interfaces TypeScript
+  app.config.ts          - Configuracion raiz de la aplicacion
+  app.routes.ts          - Definicion de rutas con carga diferida
 ```
 
-### State Management Pattern
+### Patron de gestion del estado
 
-Signals are used for all local component state:
+Se usan Signals para todo el estado local de los componentes:
 
 ```typescript
-// Reactive state with Angular Signals
 readonly posts = signal<Post[]>([]);
 readonly search = signal<string>('');
 readonly filteredPosts = computed(() =>
@@ -83,27 +82,27 @@ readonly filteredPosts = computed(() =>
 );
 ```
 
-### Error Handling Flow
+### Flujo de manejo de errores
 
 ```
-HTTP Request
+Solicitud HTTP
     -> HttpClient
-    -> httpErrorInterceptor (catches HttpErrorResponse)
+    -> httpErrorInterceptor (captura HttpErrorResponse)
     -> ErrorService.handle()
-    -> mapErrorToMessage() (status code mapping)
-    -> ToastComponent (user-visible notification)
+    -> mapErrorToMessage() (mapeo por codigo de estado)
+    -> ToastComponent (notificacion visible al usuario)
 ```
 
-## API Response Contract
+## Contrato de respuesta de la API
 
-All API responses conform to the following shape:
+Todas las respuestas de la API siguen este formato:
 
-Success:
+Exito:
 ```json
 { "success": true, "message": "OK", "data": { ... } }
 ```
 
 Error:
 ```json
-{ "success": false, "message": "Human-readable error", "status": 404 }
+{ "success": false, "message": "Descripcion del error", "status": 404 }
 ```

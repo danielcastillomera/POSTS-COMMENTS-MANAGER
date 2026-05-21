@@ -1,54 +1,53 @@
 # Posts & Comments Manager
 
-A full-stack web application for managing posts and comments, built with Angular 18+ and NestJS backed by MongoDB.
+Aplicacion web full-stack para administrar publicaciones y comentarios, construida con Angular 18+ y NestJS respaldada por MongoDB.
 
-## Technology Stack
+## Tecnologias
 
 - **Frontend**: Angular 18+, TypeScript, Tailwind CSS, Angular Signals, RxJS
 - **Backend**: NestJS 10, TypeScript, Mongoose, class-validator
-- **Database**: MongoDB
-- **Containerization**: Docker, Docker Compose
+- **Base de datos**: MongoDB (Atlas en produccion)
+- **Contenedores**: Docker, Docker Compose
 
-## Repository Structure
+## Estructura del repositorio
 
 ```
 POSTS-COMMENTS-MANAGER/
-├── backend/          # NestJS REST API
-├── frontend/         # Angular 18+ SPA
-├── docs/             # Project documentation
-├── sample-data/      # Sample JSON files for bulk operations
-└── postman/          # API collection for testing
+├── backend/          # API REST en NestJS
+├── frontend/         # SPA en Angular 18+
+├── docs/             # Documentacion del proyecto
+├── sample-data/      # Archivos JSON de ejemplo para operaciones masivas
+└── postman/          # Coleccion de Postman para pruebas de API
 ```
 
-## Prerequisites
+## Prerequisitos
 
 - Node.js >= 20.x
 - npm >= 10.x
-- MongoDB >= 6.x (or Docker)
-- Angular CLI >= 18.x (global install optional)
+- MongoDB >= 6.x (o Docker)
 
-## Getting Started
+## Inicio rapido
 
-### 1. Clone the repository
+### 1. Clonar el repositorio
 
 ```bash
 git clone https://github.com/danielcastillomera/POSTS-COMMENTS-MANAGER.git
 cd POSTS-COMMENTS-MANAGER
 ```
 
-### 2. Backend setup
+### 2. Configurar el backend
 
 ```bash
 cd backend
 cp .env.example .env
-# Edit .env with your MongoDB URI and preferred port
+# Editar .env con la URI de MongoDB y el puerto deseado
 npm install
 npm run start:dev
 ```
 
-The API will be available at `http://localhost:3000/api/v1`.
+La API estara disponible en `http://localhost:3000/api/v1`.
 
-### 3. Frontend setup
+### 3. Configurar el frontend
 
 ```bash
 cd frontend
@@ -56,68 +55,65 @@ npm install
 npm run start
 ```
 
-The application will be available at `http://localhost:4200`.
+La aplicacion estara disponible en `http://localhost:4200`.
 
-### 4. Using Docker (backend only)
+### 4. Usar Docker (solo backend)
 
 ```bash
 cd backend
 docker-compose up -d
 ```
 
-## Environment Variables
+## Variables de entorno
 
 ### Backend (`backend/.env`)
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `PORT` | Server port | `3000` |
-| `MONGODB_URI` | MongoDB connection string | `mongodb://localhost:27017/posts-manager` |
-| `FRONTEND_URL` | Allowed CORS origin | `http://localhost:4200` |
+| Variable | Descripcion | Valor por defecto |
+|----------|-------------|-------------------|
+| `PORT` | Puerto del servidor | `3000` |
+| `MONGODB_URI` | Cadena de conexion a MongoDB | `mongodb://localhost:27017/posts-manager` |
+| `FRONTEND_URL` | Origen permitido por CORS | `http://localhost:4200` |
+| `NODE_ENV` | Entorno de ejecucion | `development` |
 
 ### Frontend (`frontend/src/environments/`)
 
-Update `environment.ts` for development and `environment.prod.ts` for production with the correct backend API URL.
+Actualizar `environment.prod.ts` con la URL del backend antes de desplegar en produccion.
 
-## API Reference
+## Referencia de la API
 
-Base URL: `http://localhost:3000/api/v1`
+URL base: `http://localhost:3000/api/v1`
 
-### Posts
+### Publicaciones
 
-| Method | Endpoint | Description |
+| Metodo | Endpoint | Descripcion |
 |--------|----------|-------------|
-| GET | `/posts` | List all posts |
-| GET | `/posts/:id` | Get a single post |
-| POST | `/posts` | Create a post |
-| PUT | `/posts/:id` | Update a post |
-| DELETE | `/posts/:id` | Delete a post |
-| POST | `/posts/bulk` | Bulk create posts |
+| GET | `/posts` | Listar todas las publicaciones |
+| GET | `/posts/:id` | Obtener una publicacion |
+| POST | `/posts` | Crear una publicacion |
+| PUT | `/posts/:id` | Actualizar una publicacion |
+| DELETE | `/posts/:id` | Eliminar una publicacion |
+| POST | `/posts/bulk` | Crear publicaciones en masa |
 
-### Comments
+### Comentarios
 
-| Method | Endpoint | Description |
+| Metodo | Endpoint | Descripcion |
 |--------|----------|-------------|
-| GET | `/comments?postId={id}` | List comments by post |
-| POST | `/comments` | Create a comment |
-| DELETE | `/comments/:id` | Delete a comment |
+| GET | `/comments?postId={id}` | Listar comentarios de una publicacion |
+| POST | `/comments` | Crear un comentario |
+| DELETE | `/comments/:id` | Eliminar un comentario |
 
-## Bulk Upload
+## Carga masiva
 
-Use the sample file at `sample-data/bulk-posts.json` to test bulk post creation via `POST /api/v1/posts/bulk`.
+Usar el archivo `sample-data/bulk-posts.json` como referencia para la operacion `POST /api/v1/posts/bulk`.
 
-## Deployment
+## Despliegue
 
-See [docs/deployment.md](docs/deployment.md) for detailed deployment instructions.
+Consultar [docs/deployment.md](docs/deployment.md) para instrucciones detalladas de despliegue en Railway y Vercel.
 
-## Internationalization
+## Internacionalizacion
 
-The application supports English (en-US) and Spanish (es-MX). Language selection is persistent via localStorage. See [docs/i18n.md](docs/i18n.md) for details.
+La aplicacion soporta Espanol (Mexico) e Ingles (Estados Unidos). La seleccion persiste en `localStorage`. Ver [docs/i18n.md](docs/i18n.md) para detalles.
 
-## Architecture
+## Licencia
 
-See [docs/architecture.md](docs/architecture.md) for a detailed architecture overview.
-
-## License
-
-This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+Este proyecto esta bajo la licencia MIT. Ver [LICENSE](LICENSE) para mas informacion.

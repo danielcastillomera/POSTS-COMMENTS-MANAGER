@@ -1,71 +1,136 @@
-# Deployment Guide
+# Guia de despliegue
 
-## Frontend - Vercel
+## Arquitectura de produccion recomendada
 
-The frontend is a static Angular SPA and deploys to Vercel with zero configuration.
+| Capa | Servicio | Costo |
+|------|----------|-------|
+| Base de datos | MongoDB Atlas (M0) | Gratuito |
+| Backend (NestJS) | Railway | Gratuito (credito mensual) |
+| Frontend (Angular) | Vercel | Gratuito |
 
-### Steps
+---
 
-1. Push the repository to GitHub (already public at `github.com/danielcastillomera/POSTS-COMMENTS-MANAGER`).
-2. Import the repository on [vercel.com](https://vercel.com).
-3. Set the root directory to `frontend`.
-4. Vercel detects Angular and runs `npm run build` automatically.
-5. Set the environment variable (or update `environment.prod.ts`) with your backend URL.
+## Paso 1 — MongoDB Atlas (base de datos)
 
-The `vercel.json` at the project root handles SPA routing rewrites.
+1. Crear cuenta en [cloud.mongodb.com](https://cloud.mongodb.com).
+2. Crear un nuevo proyecto y dentro de el un cluster **M0 Free**.
+3. En **Database Access**, crear un usuario con contrasena segura. Guardar las credenciales.
+4. En **Network Access**, agregar la entrada `0.0.0.0/0` (permitir acceso desde cualquier IP). Esto es necesario para que Railway pueda conectarse.
+5. En el cluster, click en **Connect** > **Drivers**. Copiar el string de conexion y reemplazar `<password>` con la contrasena creada. Agregar el nombre de la base de datos antes del signo `?`:
 
-### Environment Variable
+```
+mongodb+srv://usuario:contrasena@cluster.xxxxx.mongodb.net/posts-manager?retryWrites=true&w=majority
+```
 
-Before deploying, update `frontend/src/environments/environment.prod.ts`:
+Este valor es el `MONGODB_URI` que se usara en Railway.
+
+---
+
+## Paso 2 — Backend en Railway
+
+1. Crear cuenta en [railway.app](https://railway.app) con GitHub.
+2. Crear nuevo proyecto > **Deploy from GitHub repo** > seleccionar el repositorio.
+3. En el servicio creado > **Settings** > **Root Directory**: escribir `backend`.
+4. En la pestana **Variables**, agregar las siguientes:
+
+| Variable | Valor |
+|----------|-------|
+| `MONGODB_URI` | String de conexion de Atlas (Paso 1) |
+| `PORT` | `3000` |
+| `NODE_ENV` | `production` |
+| `FRONTEND_URL` | Agregar despues con la URL de Vercel |
+
+5. En **Settings** > **Networking** > **Generate Domain**. Copiar la URL generada (ejemplo: `https://posts-manager-api.up.railway.app`). Esta es la URL del backend.
+6. Verificar en **Deploy Logs** que aparezca `Application running on port 3000`.
+
+### Solucion al error de IP en MongoDB Atlas
+
+Si Railway muestra el error `MongooseServerSelectionError: Could not connect to any servers`:
+
+1. Ir a MongoDB Atlas > **Network Access**.
+2. Click en **Add IP Address**.
+3. Seleccionar **Allow Access from Anywhere** o ingresar `0.0.0.0/0` manualmente.
+4. Guardar. Railway reintentara la conexion automaticamente.
+
+---
+
+## Paso 3 — Configurar la URL del backend en el frontend
+
+Antes de desplegar el frontend, actualizar el archivo `frontend/src/environments/environment.prod.ts` con la URL de Railway obtenida en el Paso 2:
 
 ```typescript
 export const environment = {
   production: true,
-  apiUrl: 'https://your-backend-url.com/api/v1',
+  apiUrl: 'https://posts-manager-api.up.railway.app/api/v1',
 };
 ```
 
-## Backend - Docker
-
-### Prerequisites
-
-- Docker >= 24
-- Docker Compose >= 2
-
-### Run with Docker Compose
+Hacer commit y push:
 
 ```bash
-cd backend
-cp .env.example .env
-# Edit .env if needed
-docker-compose up -d
+git add frontend/src/environments/environment.prod.ts
+git commit -m "chore: configurar URL de API en produccion"
+git push
 ```
 
-This starts two containers:
-- `posts-manager-api` on port `3000`
-- `posts-manager-db` (MongoDB 7) on port `27017`
+---
 
-### Build only the API image
+## Paso 4 — Frontend en Vercel
 
-```bash
-cd backend
-docker build -t posts-manager-api .
-docker run -p 3000:3000 \
-  -e MONGODB_URI=mongodb://your-mongo-host:27017/posts-manager \
-  -e FRONTEND_URL=https://your-frontend.vercel.app \
-  posts-manager-api
+### Opcion A: desplegar desde la raiz del repositorio (recomendado)
+
+1. Crear cuenta en [vercel.com](https://vercel.com) con GitHub.
+2. Click en **Add New Project** > importar el repositorio.
+3. **No cambiar** el directorio raiz (dejarlo en la raiz del repositorio).
+4. Vercel leera el `vercel.json` de la raiz automaticamente, que ya contiene:
+
+```json
+{
+  "buildCommand": "cd frontend && npm install && npm run build",
+  "outputDirectory": "frontend/dist/frontend/browser",
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+}
 ```
 
-## Backend - Railway / Render (alternative)
+5. Click en **Deploy**.
 
-Both Railway and Render support NestJS deployments directly from GitHub.
+### Opcion B: desplegar con directorio raiz en `frontend`
 
-1. Connect your GitHub repository.
-2. Set root directory to `backend`.
-3. Set build command: `npm install && npm run build`.
-4. Set start command: `npm run start:prod`.
-5. Add environment variables: `MONGODB_URI`, `FRONTEND_URL`, `PORT`.
+1. En la configuracion del proyecto en Vercel, establecer **Root Directory** en `frontend`.
+2. Vercel usara el `frontend/vercel.json` que contiene:
 
-## Updating CORS After Deployment
+```json
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist/frontend/browser",
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+}
+```
 
-After the frontend is deployed, update the `FRONTEND_URL` environment variable on the backend to match the Vercel URL (e.g. `https://posts-comments-manager.vercel.app`).
+3. Click en **Deploy**.
+
+---
+
+## Paso 5 — Actualizar CORS en Railway
+
+Una vez que Vercel asigne la URL del frontend (ejemplo: `https://posts-comments-manager.vercel.app`), volver a Railway y actualizar la variable:
+
+| Variable | Valor |
+|----------|-------|
+| `FRONTEND_URL` | `https://posts-comments-manager.vercel.app` |
+
+Railway redespliega automaticamente con el nuevo valor de CORS.
+
+---
+
+## Verificacion final
+
+```
+# 1. El backend responde correctamente
+GET https://posts-manager-api.up.railway.app/api/v1/posts
+
+# 2. El frontend carga sin errores
+https://posts-comments-manager.vercel.app
+
+# 3. Crear una publicacion desde la interfaz y verificar que aparece en la lista
+```

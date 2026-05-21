@@ -1,52 +1,52 @@
-# Posts & Comments Manager - Documentation
+# Posts & Comments Manager - Documentacion
 
-## Overview
+## Descripcion general
 
-Posts & Comments Manager is a full-stack web application built to manage posts and comments. The system provides a complete CRUD interface backed by a NestJS REST API connected to MongoDB, with an Angular 18+ single-page application as the frontend.
+Posts & Comments Manager es una aplicacion web full-stack para administrar publicaciones y comentarios. El sistema ofrece una interfaz CRUD completa respaldada por una API REST en NestJS conectada a MongoDB, con una aplicacion de pagina unica en Angular 18+ como frontend.
 
-## Project Goals
+## Objetivos del proyecto
 
-- Demonstrate clean, modular architecture across both backend and frontend
-- Apply Angular 18+ reactive patterns: Signals, computed state, and reactive forms
-- Implement robust error handling at every layer
-- Deliver a production-ready, responsive UI accessible on any device
+- Demostrar arquitectura modular limpia en backend y frontend
+- Aplicar patrones reactivos de Angular 18+: Signals, estado computado y formularios reactivos
+- Implementar manejo robusto de errores en cada capa
+- Entregar una interfaz responsiva accesible desde cualquier dispositivo
 
-## Repository Structure
+## Estructura del repositorio
 
-| Directory | Description |
-|-----------|-------------|
-| `backend/` | NestJS REST API with Mongoose |
-| `frontend/` | Angular 18+ SPA with Tailwind CSS |
-| `docs/` | Project documentation (this wiki) |
-| `sample-data/` | JSON fixtures for bulk operations |
-| `postman/` | Postman collection for API testing |
+| Directorio | Descripcion |
+|------------|-------------|
+| `backend/` | API REST en NestJS con Mongoose |
+| `frontend/` | SPA en Angular 18+ con Tailwind CSS |
+| `docs/` | Documentacion del proyecto |
+| `sample-data/` | Datos de ejemplo para operaciones masivas |
+| `postman/` | Coleccion de Postman para pruebas de API |
 
-## Quick Links
+## Accesos rapidos
 
-- [Architecture Overview](architecture.md)
-- [Deployment Guide](deployment.md)
-- [Internationalization](i18n.md)
-- [Accessibility](accessibility.md)
+- [Arquitectura del sistema](architecture.md)
+- [Guia de despliegue](deployment.md)
+- [Internacionalizacion](i18n.md)
+- [Accesibilidad](accessibility.md)
 
-## Technology Summary
+## Resumen tecnologico
 
 ### Backend
 
-- **NestJS 10** with modular architecture
-- **Mongoose 8** for MongoDB object modeling
-- **class-validator** for DTO validation
-- **Global Exception Filter** for standardized error responses
-- **ApiResponse** utility for consistent response shape
+- **NestJS 10** con arquitectura modular
+- **Mongoose 8** para modelado de datos en MongoDB
+- **class-validator** para validacion de DTOs
+- **Filtro global de excepciones** para respuestas de error estandarizadas
+- Clase utilitaria **ApiResponse** para formato de respuesta consistente
 
 ### Frontend
 
-- **Angular 18+** standalone components
-- **Angular Signals** for reactive state management
-- **RxJS** for asynchronous data flows
-- **Reactive Forms** with built-in validators
-- **Tailwind CSS** for utility-first styling
-- Custom **i18n service** supporting es-MX and en-US
+- **Angular 18+** con componentes independientes
+- **Angular Signals** para gestion reactiva del estado
+- **RxJS** para flujos de datos asincronos
+- **Formularios reactivos** con validadores integrados
+- **Tailwind CSS** para estilos utilitarios
+- **Servicio i18n personalizado** compatible con es-MX y en-US
 
-## Getting Started
+## Inicio rapido
 
-See the [README](../README.md) for setup instructions.
+Consultar el [README](../README.md) para instrucciones de instalacion y ejecucion.

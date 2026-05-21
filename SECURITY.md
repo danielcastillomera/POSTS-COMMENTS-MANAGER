@@ -1,45 +1,45 @@
-# Security Policy
+# Politica de seguridad
 
-## Supported Versions
+## Versiones soportadas
 
-| Version | Supported |
-|---------|-----------|
-| 1.0.x   | Yes       |
+| Version | Soporte activo |
+|---------|----------------|
+| 1.0.x   | Si             |
 
-## Reporting a Vulnerability
+## Reportar una vulnerabilidad
 
-If you discover a security vulnerability in this project, do not open a public issue. Instead, send a detailed report to the repository owner via GitHub's private vulnerability reporting feature or by email.
+Si descubres una vulnerabilidad de seguridad en este proyecto, no abras un issue publico. En su lugar, envia un reporte detallado al propietario del repositorio mediante la funcion de reporte privado de vulnerabilidades de GitHub o por correo electronico.
 
-Please include:
+El reporte debe incluir:
 
-- A description of the vulnerability
-- Steps to reproduce the issue
-- Potential impact assessment
-- Any suggested remediation if available
+- Descripcion de la vulnerabilidad
+- Pasos para reproducirla
+- Evaluacion del impacto potencial
+- Sugerencia de correccion, si la tienes disponible
 
-You will receive a response within 72 hours acknowledging receipt of the report. If the vulnerability is confirmed, a patch will be prioritized accordingly.
+Recibiras una respuesta en un plazo maximo de 72 horas confirmando la recepcion. Si la vulnerabilidad se confirma, se priorizara un parche de acuerdo con la severidad del problema.
 
-## Security Practices Applied in This Project
+## Practicas de seguridad aplicadas en este proyecto
 
 ### Backend
 
-- Input validation using `class-validator` on all DTOs
-- `ValidationPipe` configured with `whitelist: true` and `forbidNonWhitelisted: true` to strip unexpected fields
-- CORS configured to allow only the declared frontend origin
-- Environment variables used for all sensitive configuration (no hardcoded secrets)
-- Global exception filter prevents leaking stack traces or internal error details in production
+- Validacion de entrada con `class-validator` en todos los DTOs
+- `ValidationPipe` configurado con `whitelist: true` y `forbidNonWhitelisted: true` para eliminar campos no esperados
+- CORS configurado para permitir unicamente el origen declarado del frontend
+- Variables de entorno para toda la configuracion sensible (sin secretos en el codigo fuente)
+- El filtro global de excepciones evita que trazas de error o detalles internos lleguen al cliente en produccion
 
 ### Frontend
 
-- HTTP interceptor sanitizes error responses before displaying them in the UI
-- No sensitive data stored in `localStorage` beyond language preference
-- Environment-specific API URLs to prevent accidental production data exposure during development
+- El interceptor HTTP sanitiza las respuestas de error antes de mostrarlas en la interfaz
+- No se almacena informacion sensible en `localStorage`, unicamente la preferencia de idioma
+- Las URLs de la API por entorno evitan exponer datos de produccion durante el desarrollo
 
-### Dependency Management
+### Gestion de dependencias
 
-- Dependencies should be audited regularly with `npm audit`
-- Keep `@nestjs/*`, `@angular/*`, and `mongoose` packages updated to their latest stable versions
+- Ejecutar `npm audit` periodicamente en ambos proyectos
+- Mantener `@nestjs/*`, `@angular/*` y `mongoose` actualizados a sus versiones estables mas recientes
 
-## Disclaimer
+## Aviso
 
-This project is provided as a technical evaluation deliverable. For production use, additional hardening measures should be applied, including but not limited to: rate limiting, authentication and authorization, HTTPS enforcement, and security headers.
+Este proyecto fue entregado como prueba tecnica. Para uso en produccion real se recomienda aplicar medidas adicionales como: limitacion de tasa de solicitudes, autenticacion y autorizacion, HTTPS forzado y cabeceras de seguridad HTTP.
