@@ -75,9 +75,9 @@ export class BulkUploadComponent {
 
   loadSample(): void {
     this.jsonInput = `[
-  { "title": "Introduccion a NestJS", "body": "NestJS es un framework de Node.js que permite construir aplicaciones escalables y mantenibles del lado del servidor.", "author": "Juan Perez" },
-  { "title": "Angular Signals explicado", "body": "Los Signals de Angular son una nueva primitiva de reactividad que permite un control mas fino sobre la deteccion de cambios.", "author": "Maria Lopez" },
-  { "title": "MongoDB con Mongoose", "body": "Mongoose es una libreria de modelado de objetos para MongoDB que proporciona una solucion directa basada en esquemas.", "author": "Carlos Ramirez" }
+  { "title": "Introducción a NestJS", "body": "NestJS es un framework de Node.js que permite construir aplicaciones escalables y mantenibles del lado del servidor.", "author": "Juan Pérez" },
+  { "title": "Angular Signals explicado", "body": "Los Signals de Angular son una nueva primitiva de reactividad que permite un control más fino sobre la detección de cambios.", "author": "María López" },
+  { "title": "MongoDB con Mongoose", "body": "Mongoose es una librería de modelado de objetos para MongoDB que proporciona una solución directa basada en esquemas.", "author": "Carlos Ramírez" }
 ]`;
     this.parseError.set('');
   }
@@ -87,13 +87,13 @@ export class BulkUploadComponent {
     try {
       const parsed = JSON.parse(this.jsonInput);
       if (!Array.isArray(parsed) || parsed.length === 0) {
-        this.parseError.set('El JSON debe ser un arreglo no vacio.');
+        this.parseError.set('El JSON debe ser un arreglo no vacío.');
         return;
       }
       posts = parsed as CreatePostPayload[];
       this.parseError.set('');
     } catch {
-      this.parseError.set('JSON invalido. Verifique el formato.');
+      this.parseError.set('JSON inválido. Verifique el formato.');
       return;
     }
 
@@ -107,7 +107,7 @@ export class BulkUploadComponent {
           this.jsonInput = '';
           this.uploaded.emit();
         }),
-        catchError(() => {
+        catchError((_err) => {
           this.isUploading.set(false);
           return of(null);
         }),

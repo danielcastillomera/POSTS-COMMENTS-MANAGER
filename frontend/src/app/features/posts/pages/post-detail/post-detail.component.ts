@@ -1,7 +1,7 @@
 import { Component, inject, Input, OnInit, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { switchMap, tap, catchError } from 'rxjs/operators';
+import { tap, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { PostsService } from '../../services/posts.service';
 import { CommentsService } from '../../services/comments.service';
@@ -53,7 +53,7 @@ export class PostDetailComponent implements OnInit {
           this.isLoadingPost.set(false);
           this.loadComments();
         }),
-        catchError(() => {
+        catchError((_err) => {
           this.isLoadingPost.set(false);
           return of(null);
         }),
@@ -70,7 +70,7 @@ export class PostDetailComponent implements OnInit {
           this.comments.set(res.data);
           this.isLoadingComments.set(false);
         }),
-        catchError(() => {
+        catchError((_err) => {
           this.isLoadingComments.set(false);
           return of(null);
         }),
@@ -80,7 +80,7 @@ export class PostDetailComponent implements OnInit {
 
   onCommentAdded(comment: Comment): void {
     this.comments.update((prev) => [comment, ...prev]);
-    this.errorService.show('success', 'Comentario agregado.');
+    this.errorService.show('success', 'Comentario publicado correctamente.');
   }
 
   onCommentDeleted(id: string): void {
@@ -91,21 +91,25 @@ export class PostDetailComponent implements OnInit {
           this.comments.update((prev) => prev.filter((c) => c._id !== id));
           this.errorService.show('success', 'Comentario eliminado.');
         }),
-        catchError(() => of(null)),
+        catchError((_err) => of(null)),
       )
       .subscribe();
   }
 
   deletePost(): void {
-    if (!confirm('Confirma que deseas eliminar este post.')) return;
+    const msg =
+      this.i18nLang() === 'en-US'
+        ? 'Are you sure you want to delete this post?'
+        : '¿Confirmas que deseas eliminar esta publicación?';
+    if (!confirm(msg)) return;
     this.postsService
       .remove(this.id)
       .pipe(
         tap(() => {
-          this.errorService.show('success', 'Post eliminado.');
+          this.errorService.show('success', 'Publicación eliminada.');
           this.router.navigate(['/posts']);
         }),
-        catchError(() => of(null)),
+        catchError((_err) => of(null)),
       )
       .subscribe();
   }
@@ -116,5 +120,10 @@ export class PostDetailComponent implements OnInit {
       month: 'long',
       day: 'numeric',
     });
+  }
+
+  // Acceso al idioma activo para mensajes confirm()
+  private i18nLang(): string {
+    return localStorage.getItem('app_lang') ?? 'es-MX';
   }
 }

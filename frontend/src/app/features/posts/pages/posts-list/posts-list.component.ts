@@ -76,7 +76,7 @@ export class PostsListComponent implements OnInit {
       .pipe(
         tap(() => {
           this.posts.update((prev) => prev.filter((p) => p._id !== id));
-          this.errorService.show('success', 'Post eliminado correctamente.');
+          this.errorService.show('success', 'Publicación eliminada correctamente.');
         }),
         catchError((_err) => of(null)),
       )

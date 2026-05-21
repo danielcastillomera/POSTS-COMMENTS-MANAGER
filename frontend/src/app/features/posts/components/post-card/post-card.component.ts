@@ -54,13 +54,19 @@ export class PostCardComponent {
   @Output() readonly deleted = new EventEmitter<string>();
 
   onDelete(): void {
-    if (confirm(`Eliminar el post "${this.post.title}"?`)) {
+    const lang = localStorage.getItem('app_lang') ?? 'es-MX';
+    const msg =
+      lang === 'en-US'
+        ? `Delete the post "${this.post.title}"?`
+        : `¿Eliminar la publicación "${this.post.title}"?`;
+    if (confirm(msg)) {
       this.deleted.emit(this.post._id);
     }
   }
 
   formatDate(date: string): string {
-    return new Date(date).toLocaleDateString('es-MX', {
+    const lang = localStorage.getItem('app_lang') ?? 'es-MX';
+    return new Date(date).toLocaleDateString(lang, {
       day: '2-digit',
       month: 'short',
       year: 'numeric',

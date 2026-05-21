@@ -2,7 +2,7 @@ import { Component, inject, Input, OnInit, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { switchMap, tap, catchError } from 'rxjs/operators';
+import { tap, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { PostsService } from '../../services/posts.service';
 import { ErrorService } from '../../../../core/services/error.service';
@@ -29,8 +29,8 @@ export class PostFormComponent implements OnInit {
 
   readonly form = this.fb.nonNullable.group({
     title: ['', [Validators.required, Validators.minLength(3)]],
-    body: ['', [Validators.required, Validators.minLength(10)]],
-    author: ['', Validators.required],
+    body:  ['', [Validators.required, Validators.minLength(10)]],
+    author:['', Validators.required],
   });
 
   ngOnInit(): void {
@@ -47,13 +47,13 @@ export class PostFormComponent implements OnInit {
       .pipe(
         tap((res) => {
           this.form.patchValue({
-            title: res.data.title,
-            body: res.data.body,
+            title:  res.data.title,
+            body:   res.data.body,
             author: res.data.author,
           });
           this.isLoadingPost.set(false);
         }),
-        catchError(() => {
+        catchError((_err) => {
           this.isLoadingPost.set(false);
           return of(null);
         }),
@@ -77,12 +77,12 @@ export class PostFormComponent implements OnInit {
       .pipe(
         tap(() => {
           const msg = this.isEditMode()
-            ? 'Post actualizado correctamente.'
-            : 'Post creado correctamente.';
+            ? 'Publicación actualizada correctamente.'
+            : 'Publicación creada correctamente.';
           this.errorService.show('success', msg);
           this.router.navigate(['/posts']);
         }),
-        catchError(() => {
+        catchError((_err) => {
           this.isLoading.set(false);
           return of(null);
         }),

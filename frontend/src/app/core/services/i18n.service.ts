@@ -37,13 +37,14 @@ export class I18nService {
 
   private async loadLanguage(lang: Language): Promise<void> {
     try {
+      // Ruta absoluta para garantizar resolucion correcta en produccion (Vercel).
       const data = await firstValueFrom(
-        this.http.get<TranslationMap>(`assets/i18n/${lang}.json`),
+        this.http.get<TranslationMap>(`/assets/i18n/${lang}.json`),
       );
       this._translations = data;
       this._lang.set(lang);
     } catch {
-      console.error(`Failed to load language: ${lang}`);
+      console.error(`No se pudo cargar el idioma: ${lang}`);
     }
   }
 }

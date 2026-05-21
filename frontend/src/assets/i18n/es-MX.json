@@ -1,39 +1,39 @@
 {
   "nav": {
     "posts": "Publicaciones",
-    "newPost": "Nueva publicacion"
+    "newPost": "Nueva publicación"
   },
   "posts": {
     "list": {
       "title": "Publicaciones",
       "results": "resultados",
-      "search": "Buscar por titulo o autor...",
-      "new": "Nueva publicacion",
+      "search": "Buscar por título o autor...",
+      "new": "Nueva publicación",
       "bulk": "Carga masiva",
       "empty": {
         "title": "Sin publicaciones",
-        "description": "No hay publicaciones aun. Crea la primera."
+        "description": "No hay publicaciones aún. Crea la primera."
       }
     },
     "form": {
-      "createTitle": "Nueva publicacion",
-      "editTitle": "Editar publicacion",
+      "createTitle": "Nueva publicación",
+      "editTitle": "Editar publicación",
       "fields": {
-        "title": "Titulo",
+        "title": "Título",
         "body": "Contenido",
         "author": "Autor"
       },
       "placeholders": {
-        "title": "Escribe el titulo...",
-        "body": "Escribe el contenido de la publicacion...",
+        "title": "Escribe el título...",
+        "body": "Escribe el contenido de la publicación...",
         "author": "Nombre del autor"
       },
-      "save": "Guardar publicacion",
-      "update": "Actualizar publicacion"
+      "save": "Guardar publicación",
+      "update": "Actualizar publicación"
     },
     "bulk": {
       "title": "Carga masiva de publicaciones",
-      "description": "Pega un arreglo JSON con los posts a importar. Cada elemento debe tener title, body y author.",
+      "description": "Pega un arreglo JSON con las publicaciones a importar. Cada elemento debe tener title, body y author.",
       "upload": "Importar publicaciones",
       "sample": "Cargar ejemplo"
     },
@@ -43,11 +43,11 @@
   },
   "comments": {
     "title": "Comentarios",
-    "empty": "No hay comentarios aun. Se el primero en comentar.",
+    "empty": "No hay comentarios aún. Sé el primero en comentar.",
     "form": {
       "title": "Agregar comentario",
       "name": "Nombre",
-      "email": "Correo electronico",
+      "email": "Correo electrónico",
       "body": "Comentario",
       "namePlaceholder": "Tu nombre",
       "emailPlaceholder": "tu@correo.com",
@@ -65,13 +65,13 @@
     "save": "Guardar",
     "confirm": "Confirmar",
     "error": "Error",
-    "success": "Exito"
+    "success": "Éxito"
   },
   "validation": {
     "required": "Este campo es requerido.",
-    "minLength3": "Minimo 3 caracteres.",
-    "minLength5": "Minimo 5 caracteres.",
-    "minLength10": "Minimo 10 caracteres.",
-    "email": "Ingresa un correo electronico valido."
+    "minLength3": "Mínimo 3 caracteres.",
+    "minLength5": "Mínimo 5 caracteres.",
+    "minLength10": "Mínimo 10 caracteres.",
+    "email": "Ingresa un correo electrónico válido."
   }
 }
