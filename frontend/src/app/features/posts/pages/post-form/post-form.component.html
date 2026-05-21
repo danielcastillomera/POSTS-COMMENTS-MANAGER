@@ -1,0 +1,93 @@
+<section class="max-w-2xl mx-auto space-y-6">
+  <div>
+    <a routerLink="/posts" class="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 mb-4">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+      </svg>
+      {{ 'common.back' | translate }}
+    </a>
+    <h1 class="page-title">
+      {{ (isEditMode() ? 'posts.form.editTitle' : 'posts.form.createTitle') | translate }}
+    </h1>
+  </div>
+
+  @if (isLoadingPost()) {
+    <app-loading [label]="'common.loading' | translate" />
+  } @else {
+    <div class="card p-6">
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate class="space-y-5">
+        <div>
+          <label for="title" class="form-label">
+            {{ 'posts.form.fields.title' | translate }}
+            <span class="text-red-500 ml-0.5">*</span>
+          </label>
+          <input
+            id="title"
+            type="text"
+            formControlName="title"
+            class="form-field"
+            [placeholder]="'posts.form.placeholders.title' | translate"
+            [attr.aria-invalid]="hasError('title', 'required') || hasError('title', 'minlength')" />
+          @if (hasError('title', 'required')) {
+            <p class="form-error">{{ 'validation.required' | translate }}</p>
+          } @else if (hasError('title', 'minlength')) {
+            <p class="form-error">{{ 'validation.minLength3' | translate }}</p>
+          }
+        </div>
+
+        <div>
+          <label for="author" class="form-label">
+            {{ 'posts.form.fields.author' | translate }}
+            <span class="text-red-500 ml-0.5">*</span>
+          </label>
+          <input
+            id="author"
+            type="text"
+            formControlName="author"
+            class="form-field"
+            [placeholder]="'posts.form.placeholders.author' | translate"
+            [attr.aria-invalid]="hasError('author', 'required')" />
+          @if (hasError('author', 'required')) {
+            <p class="form-error">{{ 'validation.required' | translate }}</p>
+          }
+        </div>
+
+        <div>
+          <label for="body" class="form-label">
+            {{ 'posts.form.fields.body' | translate }}
+            <span class="text-red-500 ml-0.5">*</span>
+          </label>
+          <textarea
+            id="body"
+            formControlName="body"
+            rows="8"
+            class="form-field resize-none"
+            [placeholder]="'posts.form.placeholders.body' | translate"
+            [attr.aria-invalid]="hasError('body', 'required') || hasError('body', 'minlength')">
+          </textarea>
+          @if (hasError('body', 'required')) {
+            <p class="form-error">{{ 'validation.required' | translate }}</p>
+          } @else if (hasError('body', 'minlength')) {
+            <p class="form-error">{{ 'validation.minLength10' | translate }}</p>
+          }
+        </div>
+
+        <div class="flex gap-3 pt-2">
+          <button
+            type="submit"
+            class="btn-primary"
+            [disabled]="isLoading()">
+            @if (isLoading()) {
+              <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+              </svg>
+            }
+            {{ (isEditMode() ? 'posts.form.update' : 'posts.form.save') | translate }}
+          </button>
+          <a routerLink="/posts" class="btn-secondary">{{ 'common.cancel' | translate }}</a>
+        </div>
+      </form>
+    </div>
+  }
+</section>

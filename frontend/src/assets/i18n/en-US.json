@@ -1,0 +1,77 @@
+{
+  "nav": {
+    "posts": "Posts",
+    "newPost": "New post"
+  },
+  "posts": {
+    "list": {
+      "title": "Posts",
+      "results": "results",
+      "search": "Search by title or author...",
+      "new": "New post",
+      "bulk": "Bulk upload",
+      "empty": {
+        "title": "No posts yet",
+        "description": "There are no posts yet. Create the first one."
+      }
+    },
+    "form": {
+      "createTitle": "New post",
+      "editTitle": "Edit post",
+      "fields": {
+        "title": "Title",
+        "body": "Content",
+        "author": "Author"
+      },
+      "placeholders": {
+        "title": "Write the title...",
+        "body": "Write the post content...",
+        "author": "Author name"
+      },
+      "save": "Save post",
+      "update": "Update post"
+    },
+    "bulk": {
+      "title": "Bulk post upload",
+      "description": "Paste a JSON array with the posts to import. Each item must have title, body and author.",
+      "upload": "Import posts",
+      "sample": "Load example"
+    },
+    "detail": {
+      "by": "By"
+    }
+  },
+  "comments": {
+    "title": "Comments",
+    "empty": "No comments yet. Be the first to comment.",
+    "form": {
+      "title": "Add a comment",
+      "name": "Name",
+      "email": "Email",
+      "body": "Comment",
+      "namePlaceholder": "Your name",
+      "emailPlaceholder": "you@email.com",
+      "bodyPlaceholder": "Write your comment...",
+      "submit": "Post comment"
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "back": "Go back",
+    "view": "View",
+    "edit": "Edit",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "save": "Save",
+    "confirm": "Confirm",
+    "error": "Error",
+    "success": "Success"
+  },
+  "validation": {
+    "required": "This field is required.",
+    "minLength3": "Minimum 3 characters.",
+    "minLength5": "Minimum 5 characters.",
+    "minLength10": "Minimum 10 characters.",
+    "email": "Enter a valid email address."
+  }
+}

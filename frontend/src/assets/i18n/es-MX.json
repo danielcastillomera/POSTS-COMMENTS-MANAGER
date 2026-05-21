@@ -1,0 +1,77 @@
+{
+  "nav": {
+    "posts": "Publicaciones",
+    "newPost": "Nueva publicacion"
+  },
+  "posts": {
+    "list": {
+      "title": "Publicaciones",
+      "results": "resultados",
+      "search": "Buscar por titulo o autor...",
+      "new": "Nueva publicacion",
+      "bulk": "Carga masiva",
+      "empty": {
+        "title": "Sin publicaciones",
+        "description": "No hay publicaciones aun. Crea la primera."
+      }
+    },
+    "form": {
+      "createTitle": "Nueva publicacion",
+      "editTitle": "Editar publicacion",
+      "fields": {
+        "title": "Titulo",
+        "body": "Contenido",
+        "author": "Autor"
+      },
+      "placeholders": {
+        "title": "Escribe el titulo...",
+        "body": "Escribe el contenido de la publicacion...",
+        "author": "Nombre del autor"
+      },
+      "save": "Guardar publicacion",
+      "update": "Actualizar publicacion"
+    },
+    "bulk": {
+      "title": "Carga masiva de publicaciones",
+      "description": "Pega un arreglo JSON con los posts a importar. Cada elemento debe tener title, body y author.",
+      "upload": "Importar publicaciones",
+      "sample": "Cargar ejemplo"
+    },
+    "detail": {
+      "by": "Por"
+    }
+  },
+  "comments": {
+    "title": "Comentarios",
+    "empty": "No hay comentarios aun. Se el primero en comentar.",
+    "form": {
+      "title": "Agregar comentario",
+      "name": "Nombre",
+      "email": "Correo electronico",
+      "body": "Comentario",
+      "namePlaceholder": "Tu nombre",
+      "emailPlaceholder": "tu@correo.com",
+      "bodyPlaceholder": "Escribe tu comentario...",
+      "submit": "Publicar comentario"
+    }
+  },
+  "common": {
+    "loading": "Cargando...",
+    "back": "Regresar",
+    "view": "Ver",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "confirm": "Confirmar",
+    "error": "Error",
+    "success": "Exito"
+  },
+  "validation": {
+    "required": "Este campo es requerido.",
+    "minLength3": "Minimo 3 caracteres.",
+    "minLength5": "Minimo 5 caracteres.",
+    "minLength10": "Minimo 10 caracteres.",
+    "email": "Ingresa un correo electronico valido."
+  }
+}

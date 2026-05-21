@@ -1,0 +1,119 @@
+{
+  "info": {
+    "name": "Posts & Comments Manager API",
+    "description": "Complete API collection for Posts & Comments Manager. Base URL: http://localhost:3000/api/v1",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000/api/v1", "type": "string" },
+    { "key": "postId", "value": "", "type": "string" },
+    { "key": "commentId", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Posts",
+      "item": [
+        {
+          "name": "GET All Posts",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/posts", "host": ["{{baseUrl}}"], "path": ["posts"] },
+            "description": "Retrieve all posts sorted by creation date descending."
+          }
+        },
+        {
+          "name": "GET Post by ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/posts/{{postId}}", "host": ["{{baseUrl}}"], "path": ["posts", "{{postId}}"] },
+            "description": "Retrieve a single post by MongoDB ObjectId."
+          }
+        },
+        {
+          "name": "POST Create Post",
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{baseUrl}}/posts", "host": ["{{baseUrl}}"], "path": ["posts"] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Mi primer post\",\n  \"body\": \"Este es el contenido de mi primer post de prueba.\",\n  \"author\": \"Usuario Prueba\"\n}"
+            }
+          }
+        },
+        {
+          "name": "PUT Update Post",
+          "request": {
+            "method": "PUT",
+            "url": { "raw": "{{baseUrl}}/posts/{{postId}}", "host": ["{{baseUrl}}"], "path": ["posts", "{{postId}}"] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Titulo actualizado\",\n  \"body\": \"Contenido del post actualizado con nueva informacion.\",\n  \"author\": \"Autor Actualizado\"\n}"
+            }
+          }
+        },
+        {
+          "name": "DELETE Post",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/posts/{{postId}}", "host": ["{{baseUrl}}"], "path": ["posts", "{{postId}}"] },
+            "description": "Delete a post by ID."
+          }
+        },
+        {
+          "name": "POST Bulk Create Posts",
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{baseUrl}}/posts/bulk", "host": ["{{baseUrl}}"], "path": ["posts", "bulk"] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  { \"title\": \"Post Masivo 1\", \"body\": \"Contenido del primer post de la carga masiva.\", \"author\": \"Usuario 1\" },\n  { \"title\": \"Post Masivo 2\", \"body\": \"Contenido del segundo post de la carga masiva.\", \"author\": \"Usuario 2\" },\n  { \"title\": \"Post Masivo 3\", \"body\": \"Contenido del tercer post de la carga masiva.\", \"author\": \"Usuario 3\" }\n]"
+            },
+            "description": "Insert multiple posts in a single operation using insertMany."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Comments",
+      "item": [
+        {
+          "name": "GET Comments by Post",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/comments?postId={{postId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["comments"],
+              "query": [{ "key": "postId", "value": "{{postId}}" }]
+            },
+            "description": "List all comments for a given post."
+          }
+        },
+        {
+          "name": "POST Create Comment",
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{baseUrl}}/comments", "host": ["{{baseUrl}}"], "path": ["comments"] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"postId\": \"{{postId}}\",\n  \"name\": \"Visitante Prueba\",\n  \"email\": \"visitante@example.com\",\n  \"body\": \"Este es un comentario de prueba para el post.\"\n}"
+            }
+          }
+        },
+        {
+          "name": "DELETE Comment",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/comments/{{commentId}}", "host": ["{{baseUrl}}"], "path": ["comments", "{{commentId}}"] },
+            "description": "Delete a comment by ID."
+          }
+        }
+      ]
+    }
+  ]
+}

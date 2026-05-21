@@ -1,0 +1,27 @@
+[
+  {
+    "title": "Introduccion a NestJS con MongoDB",
+    "body": "NestJS es un framework progresivo de Node.js para construir aplicaciones del lado del servidor eficientes, confiables y escalables. Combinado con MongoDB a traves de Mongoose, se convierte en una poderosa herramienta para el desarrollo de APIs REST modernas.",
+    "author": "Juan Perez"
+  },
+  {
+    "title": "Angular Signals: el futuro de la reactividad",
+    "body": "Los Signals de Angular representan un cambio fundamental en como se gestiona el estado en las aplicaciones Angular. A diferencia de Zone.js y RxJS para estado local, los Signals ofrecen una API mas simple y predecible que mejora el rendimiento de la deteccion de cambios.",
+    "author": "Maria Lopez"
+  },
+  {
+    "title": "Tailwind CSS para aplicaciones modernas",
+    "body": "Tailwind CSS es un framework de CSS orientado a utilidades que permite construir interfaces modernas directamente en el HTML. Su enfoque utility-first elimina la necesidad de escribir CSS personalizado para la mayoria de los casos de uso y garantiza consistencia visual.",
+    "author": "Carlos Ramirez"
+  },
+  {
+    "title": "Manejo de errores en aplicaciones full-stack",
+    "body": "Un sistema robusto de manejo de errores es critico para cualquier aplicacion en produccion. En el backend, los filtros globales de excepciones de NestJS aseguran que ningun error llegue al cliente sin procesar. En el frontend, los interceptores de Angular capturan y presentan los errores de forma amigable.",
+    "author": "Ana Martinez"
+  },
+  {
+    "title": "Arquitectura modular con NestJS",
+    "body": "La arquitectura modular de NestJS permite organizar el codigo en modulos cohesivos y desacoplados. Cada modulo encapsula controladores, servicios y esquemas relacionados, facilitando el mantenimiento, las pruebas unitarias y la escalabilidad del proyecto a medida que crece.",
+    "author": "Luis Herrera"
+  }
+]
