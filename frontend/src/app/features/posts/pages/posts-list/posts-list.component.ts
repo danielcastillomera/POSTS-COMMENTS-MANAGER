@@ -1,8 +1,16 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  OnDestroy,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { tap, catchError } from 'rxjs/operators';
+import { Subject } from 'rxjs';
+import { catchError, switchMap, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { PostsService } from '../../services/posts.service';
 import { Post } from '../../models/post.model';
@@ -28,9 +36,14 @@ import { BulkUploadComponent } from '../../components/bulk-upload/bulk-upload.co
   ],
   templateUrl: './posts-list.component.html',
 })
-export class PostsListComponent implements OnInit {
+export class PostsListComponent implements OnInit, OnDestroy {
   private readonly postsService = inject(PostsService);
   private readonly errorService = inject(ErrorService);
+
+  // switchMap: Subject que actua como trigger de recarga.
+  // Si se dispara antes de que termine la peticion anterior, switchMap la cancela.
+  private readonly reload$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
 
   readonly posts = signal<Post[]>([]);
   readonly search = signal<string>('');
@@ -46,24 +59,35 @@ export class PostsListComponent implements OnInit {
   );
 
   ngOnInit(): void {
+    // switchMap cancela la peticion HTTP anterior si se solicita una nueva recarga
+    this.reload$
+      .pipe(
+        switchMap(() =>
+          this.postsService.getAll().pipe(
+            tap((res) => {
+              this.posts.set(res.data);
+              this.isLoading.set(false);
+            }),
+            catchError((_err) => {
+              this.isLoading.set(false);
+              return of(null);
+            }),
+          ),
+        ),
+      )
+      .subscribe();
+
     this.loadPosts();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   loadPosts(): void {
     this.isLoading.set(true);
-    this.postsService
-      .getAll()
-      .pipe(
-        tap((res) => {
-          this.posts.set(res.data);
-          this.isLoading.set(false);
-        }),
-        catchError((_err) => {
-          this.isLoading.set(false);
-          return of(null);
-        }),
-      )
-      .subscribe();
+    this.reload$.next();
   }
 
   onSearch(value: string): void {

@@ -15,35 +15,37 @@ export class PostsService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/posts`;
 
+  // delay: simula latencia minima para que los loading states sean visibles.
+  // retry: reintenta la peticion hasta 2 veces si falla (ej. cold start de Railway).
   getAll(): Observable<ApiResponse<Post[]>> {
     return this.http.get<ApiResponse<Post[]>>(this.baseUrl).pipe(
-      delay(200),
+      delay(150),
       retry({ count: 2, delay: 1000 }),
     );
   }
 
   getOne(id: string): Observable<ApiResponse<Post>> {
-    return this.http.get<ApiResponse<Post>>(`${this.baseUrl}/${id}`).pipe(
-      retry({ count: 1, delay: 500 }),
-    );
+    return this.http
+      .get<ApiResponse<Post>>(`${this.baseUrl}/${id}`)
+      .pipe(retry({ count: 1, delay: 500 }));
   }
 
   create(payload: CreatePostPayload): Observable<ApiResponse<Post>> {
     return this.http
       .post<ApiResponse<Post>>(this.baseUrl, payload)
-      .pipe(tap(() => console.debug('Post created')));
+      .pipe(tap(() => console.debug('[PostsService] Post creado')));
   }
 
   update(id: string, payload: UpdatePostPayload): Observable<ApiResponse<Post>> {
     return this.http
       .put<ApiResponse<Post>>(`${this.baseUrl}/${id}`, payload)
-      .pipe(tap(() => console.debug('Post updated:', id)));
+      .pipe(tap(() => console.debug('[PostsService] Post actualizado:', id)));
   }
 
   remove(id: string): Observable<ApiResponse<null>> {
     return this.http
       .delete<ApiResponse<null>>(`${this.baseUrl}/${id}`)
-      .pipe(tap(() => console.debug('Post deleted:', id)));
+      .pipe(tap(() => console.debug('[PostsService] Post eliminado:', id)));
   }
 
   bulkCreate(

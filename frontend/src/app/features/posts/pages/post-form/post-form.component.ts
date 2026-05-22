@@ -2,8 +2,8 @@ import { Component, inject, Input, OnInit, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { tap, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { catchError, filter, switchMap, tap } from 'rxjs/operators';
 import { PostsService } from '../../services/posts.service';
 import { ErrorService } from '../../../../core/services/error.service';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
@@ -28,9 +28,9 @@ export class PostFormComponent implements OnInit {
   readonly isEditMode = signal(false);
 
   readonly form = this.fb.nonNullable.group({
-    title: ['', [Validators.required, Validators.minLength(3)]],
-    body:  ['', [Validators.required, Validators.minLength(10)]],
-    author:['', Validators.required],
+    title:  ['', [Validators.required, Validators.minLength(3)]],
+    body:   ['', [Validators.required, Validators.minLength(10)]],
+    author: ['', [Validators.required, Validators.minLength(3)]],
   });
 
   ngOnInit(): void {
@@ -42,23 +42,26 @@ export class PostFormComponent implements OnInit {
 
   private loadPost(): void {
     this.isLoadingPost.set(true);
-    this.postsService
-      .getOne(this.id!)
-      .pipe(
-        tap((res) => {
-          this.form.patchValue({
-            title:  res.data.title,
-            body:   res.data.body,
-            author: res.data.author,
-          });
-          this.isLoadingPost.set(false);
-        }),
-        catchError((_err) => {
-          this.isLoadingPost.set(false);
-          return of(null);
-        }),
-      )
-      .subscribe();
+
+    // switchMap: si el id cambia antes de que responda el servidor,
+    // cancela la peticion anterior y emite la nueva.
+    of(this.id).pipe(
+      filter((id): id is string => !!id),
+      switchMap((id) => this.postsService.getOne(id)),
+      tap((res) => {
+        this.form.patchValue({
+          title:  res.data.title,
+          body:   res.data.body,
+          author: res.data.author,
+        });
+        this.isLoadingPost.set(false);
+      }),
+      catchError((_err) => {
+        this.isLoadingPost.set(false);
+        return of(null);
+      }),
+    )
+    .subscribe();
   }
 
   onSubmit(): void {
@@ -66,7 +69,6 @@ export class PostFormComponent implements OnInit {
       this.form.markAllAsTouched();
       return;
     }
-
     this.isLoading.set(true);
     const payload = this.form.getRawValue();
     const request$ = this.isEditMode()

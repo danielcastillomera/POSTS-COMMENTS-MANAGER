@@ -8,6 +8,7 @@ import {
   Param,
   HttpCode,
   HttpStatus,
+  ParseArrayPipe,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -22,10 +23,13 @@ export class PostsController {
     return this.postsService.findAll();
   }
 
-  // bulk MUST be declared before :id to prevent routing conflicts
+  // bulk MUST be declared before :id to avoid route conflict
   @Post('bulk')
   @HttpCode(HttpStatus.CREATED)
-  bulkCreate(@Body() body: CreatePostDto[]) {
+  bulkCreate(
+    @Body(new ParseArrayPipe({ items: CreatePostDto, whitelist: true }))
+    body: CreatePostDto[],
+  ) {
     return this.postsService.bulkCreate(body);
   }
 

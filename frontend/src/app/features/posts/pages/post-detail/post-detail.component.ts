@@ -1,8 +1,8 @@
 import { Component, inject, Input, OnInit, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { tap, catchError } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { combineLatest, of } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
 import { PostsService } from '../../services/posts.service';
 import { CommentsService } from '../../services/comments.service';
 import { Post } from '../../models/post.model';
@@ -36,42 +36,28 @@ export class PostDetailComponent implements OnInit {
 
   readonly post = signal<Post | null>(null);
   readonly comments = signal<Comment[]>([]);
-  readonly isLoadingPost = signal(true);
-  readonly isLoadingComments = signal(false);
+  readonly isLoading = signal(true);
 
   ngOnInit(): void {
-    this.loadPost();
+    this.loadAll();
   }
 
-  loadPost(): void {
-    this.isLoadingPost.set(true);
-    this.postsService
-      .getOne(this.id)
+  // combineLatest: carga el post y sus comentarios en paralelo.
+  // Ambas peticiones se disparan simultaneamente; el pipe continua cuando AMBAS completan.
+  loadAll(): void {
+    this.isLoading.set(true);
+    combineLatest([
+      this.postsService.getOne(this.id),
+      this.commentsService.getByPost(this.id),
+    ])
       .pipe(
-        tap((res) => {
-          this.post.set(res.data);
-          this.isLoadingPost.set(false);
-          this.loadComments();
+        tap(([postRes, commentsRes]) => {
+          this.post.set(postRes.data);
+          this.comments.set(commentsRes.data);
+          this.isLoading.set(false);
         }),
         catchError((_err) => {
-          this.isLoadingPost.set(false);
-          return of(null);
-        }),
-      )
-      .subscribe();
-  }
-
-  loadComments(): void {
-    this.isLoadingComments.set(true);
-    this.commentsService
-      .getByPost(this.id)
-      .pipe(
-        tap((res) => {
-          this.comments.set(res.data);
-          this.isLoadingComments.set(false);
-        }),
-        catchError((_err) => {
-          this.isLoadingComments.set(false);
+          this.isLoading.set(false);
           return of(null);
         }),
       )
@@ -97,8 +83,9 @@ export class PostDetailComponent implements OnInit {
   }
 
   deletePost(): void {
+    const lang = localStorage.getItem('app_lang') ?? 'es-MX';
     const msg =
-      this.i18nLang() === 'en-US'
+      lang === 'en-US'
         ? 'Are you sure you want to delete this post?'
         : '¿Confirmas que deseas eliminar esta publicación?';
     if (!confirm(msg)) return;
@@ -115,15 +102,11 @@ export class PostDetailComponent implements OnInit {
   }
 
   formatDate(date: string): string {
-    return new Date(date).toLocaleDateString('es-MX', {
+    const lang = localStorage.getItem('app_lang') ?? 'es-MX';
+    return new Date(date).toLocaleDateString(lang, {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
     });
-  }
-
-  // Acceso al idioma activo para mensajes confirm()
-  private i18nLang(): string {
-    return localStorage.getItem('app_lang') ?? 'es-MX';
   }
 }

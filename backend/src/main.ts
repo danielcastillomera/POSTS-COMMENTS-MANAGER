@@ -6,11 +6,15 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
 
+  // CORS permisivo para entorno de prueba tecnica.
+  // El navegador bloquea POST con JSON (no-simple request) si el preflight OPTIONS falla.
+  // origin: '*' evita ese bloqueo sin necesidad de credenciales (cookies/sessions).
   app.enableCors({
-    origin: process.env.FRONTEND_URL ?? 'http://localhost:4200',
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true,
+    origin: '*',
+    methods: ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'X-Requested-With'],
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
   });
 
   app.setGlobalPrefix('api/v1');
