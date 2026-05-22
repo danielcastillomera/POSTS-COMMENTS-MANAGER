@@ -1,11 +1,4 @@
-import {
-  Component,
-  computed,
-  inject,
-  OnDestroy,
-  OnInit,
-  signal,
-} from '@angular/core';
+import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -20,35 +13,31 @@ import { LoadingComponent } from '../../../../shared/components/loading/loading.
 import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
 import { PostCardComponent } from '../../components/post-card/post-card.component';
 import { BulkUploadComponent } from '../../components/bulk-upload/bulk-upload.component';
+import { PaginationComponent } from '../../../../shared/components/pagination/pagination.component';
 
 @Component({
   selector: 'app-posts-list',
   standalone: true,
   imports: [
-    CommonModule,
-    RouterLink,
-    FormsModule,
-    TranslatePipe,
-    LoadingComponent,
-    EmptyStateComponent,
-    PostCardComponent,
-    BulkUploadComponent,
+    CommonModule, RouterLink, FormsModule, TranslatePipe,
+    LoadingComponent, EmptyStateComponent, PostCardComponent,
+    BulkUploadComponent, PaginationComponent,
   ],
   templateUrl: './posts-list.component.html',
 })
 export class PostsListComponent implements OnInit, OnDestroy {
   private readonly postsService = inject(PostsService);
   private readonly errorService = inject(ErrorService);
-
-  // switchMap: Subject que actua como trigger de recarga.
-  // Si se dispara antes de que termine la peticion anterior, switchMap la cancela.
-  private readonly reload$ = new Subject<void>();
+  private readonly reload$ = new Subject<{ page: number; limit: number }>();
   private readonly destroy$ = new Subject<void>();
 
-  readonly posts = signal<Post[]>([]);
-  readonly search = signal<string>('');
-  readonly isLoading = signal(true);
-  readonly showBulkUpload = signal(false);
+  readonly posts        = signal<Post[]>([]);
+  readonly search       = signal('');
+  readonly isLoading    = signal(true);
+  readonly showBulk     = signal(false);
+  readonly currentPage  = signal(1);
+  readonly totalPosts   = signal(0);
+  readonly limit        = 9;
 
   readonly filteredPosts = computed(() =>
     this.posts().filter(
@@ -59,56 +48,45 @@ export class PostsListComponent implements OnInit, OnDestroy {
   );
 
   ngOnInit(): void {
-    // switchMap cancela la peticion HTTP anterior si se solicita una nueva recarga
     this.reload$
       .pipe(
-        switchMap(() =>
-          this.postsService.getAll().pipe(
+        switchMap(({ page, limit }) =>
+          this.postsService.getAll(page, limit).pipe(
             tap((res) => {
               this.posts.set(res.data);
+              this.totalPosts.set(res.meta.total);
+              this.currentPage.set(res.meta.page);
               this.isLoading.set(false);
             }),
-            catchError((_err) => {
-              this.isLoading.set(false);
-              return of(null);
-            }),
+            catchError((_err) => { this.isLoading.set(false); return of(null); }),
           ),
         ),
       )
       .subscribe();
-
-    this.loadPosts();
+    this.loadPosts(1);
   }
 
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
+  ngOnDestroy(): void { this.destroy$.next(); this.destroy$.complete(); }
 
-  loadPosts(): void {
+  loadPosts(page: number): void {
     this.isLoading.set(true);
-    this.reload$.next();
+    this.search.set('');
+    this.reload$.next({ page, limit: this.limit });
   }
 
-  onSearch(value: string): void {
-    this.search.set(value);
-  }
+  onSearch(value: string): void { this.search.set(value); }
 
   onPostDeleted(id: string): void {
-    this.postsService
-      .remove(id)
-      .pipe(
-        tap(() => {
-          this.posts.update((prev) => prev.filter((p) => p._id !== id));
-          this.errorService.show('success', 'Publicación eliminada correctamente.');
-        }),
-        catchError((_err) => of(null)),
-      )
-      .subscribe();
+    this.postsService.remove(id).pipe(
+      tap(() => {
+        this.posts.update((prev) => prev.filter((p) => p._id !== id));
+        this.totalPosts.update((n) => n - 1);
+        this.errorService.show('success', 'Publicación eliminada correctamente.');
+      }),
+      catchError((_err) => of(null)),
+    ).subscribe();
   }
 
-  onBulkUploaded(): void {
-    this.showBulkUpload.set(false);
-    this.loadPosts();
-  }
+  onBulkUploaded(): void { this.showBulk.set(false); this.loadPosts(1); }
+  onPageChange(page: number): void { this.loadPosts(page); }
 }

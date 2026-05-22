@@ -1,7 +1,17 @@
 {
   "nav": {
     "posts": "Posts",
-    "newPost": "New post"
+    "newPost": "New post",
+    "login": "Sign in",
+    "logout": "Sign out"
+  },
+  "auth": {
+    "title": "Sign in",
+    "subtitle": "Access to create and manage posts",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Sign in",
+    "backToList": "Back to posts list"
   },
   "posts": {
     "list": {
@@ -18,11 +28,7 @@
     "form": {
       "createTitle": "New post",
       "editTitle": "Edit post",
-      "fields": {
-        "title": "Title",
-        "body": "Content",
-        "author": "Author"
-      },
+      "fields": { "title": "Title", "body": "Content", "author": "Author" },
       "placeholders": {
         "title": "Write the title...",
         "body": "Write the post content...",
@@ -37,9 +43,7 @@
       "upload": "Import posts",
       "sample": "Load example"
     },
-    "detail": {
-      "by": "By"
-    }
+    "detail": { "by": "By" }
   },
   "comments": {
     "title": "Comments",
@@ -54,6 +58,10 @@
       "bodyPlaceholder": "Write your comment...",
       "submit": "Post comment"
     }
+  },
+  "pagination": {
+    "showing": "Showing",
+    "of": "of"
   },
   "common": {
     "loading": "Loading...",

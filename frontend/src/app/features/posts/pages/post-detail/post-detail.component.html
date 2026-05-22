@@ -8,7 +8,7 @@
     </a>
   </div>
 
-  @if (isLoadingPost()) {
+  @if (isLoading()) {
     <app-loading [label]="'common.loading' | translate" />
   } @else if (post()) {
     <article class="card p-6 space-y-4">
@@ -51,10 +51,7 @@
       </div>
 
       <hr class="border-slate-100" />
-
-      <div class="prose prose-slate max-w-none">
-        <p class="text-slate-700 leading-relaxed whitespace-pre-wrap">{{ post()!.body }}</p>
-      </div>
+      <p class="text-slate-700 leading-relaxed whitespace-pre-wrap">{{ post()!.body }}</p>
     </article>
 
     <div class="space-y-4">
@@ -62,12 +59,8 @@
         {{ 'comments.title' | translate }}
         <span class="text-sm font-normal text-slate-400 ml-1">({{ comments().length }})</span>
       </h2>
-
       <app-comment-form [postId]="id" (commentAdded)="onCommentAdded($event)" />
-
-      @if (isLoadingComments()) {
-        <app-loading size="sm" [label]="'common.loading' | translate" />
-      } @else if (comments().length === 0) {
+      @if (comments().length === 0) {
         <p class="text-sm text-slate-400 text-center py-6">{{ 'comments.empty' | translate }}</p>
       } @else {
         <div class="space-y-3">

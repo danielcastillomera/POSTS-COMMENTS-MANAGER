@@ -1,7 +1,17 @@
 {
   "nav": {
     "posts": "Publicaciones",
-    "newPost": "Nueva publicación"
+    "newPost": "Nueva publicación",
+    "login": "Iniciar sesión",
+    "logout": "Cerrar sesión"
+  },
+  "auth": {
+    "title": "Iniciar sesión",
+    "subtitle": "Accede para crear y administrar publicaciones",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "submit": "Ingresar",
+    "backToList": "Volver a la lista de publicaciones"
   },
   "posts": {
     "list": {
@@ -18,11 +28,7 @@
     "form": {
       "createTitle": "Nueva publicación",
       "editTitle": "Editar publicación",
-      "fields": {
-        "title": "Título",
-        "body": "Contenido",
-        "author": "Autor"
-      },
+      "fields": { "title": "Título", "body": "Contenido", "author": "Autor" },
       "placeholders": {
         "title": "Escribe el título...",
         "body": "Escribe el contenido de la publicación...",
@@ -37,9 +43,7 @@
       "upload": "Importar publicaciones",
       "sample": "Cargar ejemplo"
     },
-    "detail": {
-      "by": "Por"
-    }
+    "detail": { "by": "Por" }
   },
   "comments": {
     "title": "Comentarios",
@@ -54,6 +58,10 @@
       "bodyPlaceholder": "Escribe tu comentario...",
       "submit": "Publicar comentario"
     }
+  },
+  "pagination": {
+    "showing": "Mostrando",
+    "of": "de"
   },
   "common": {
     "loading": "Cargando...",

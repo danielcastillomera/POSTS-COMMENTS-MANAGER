@@ -3,25 +3,24 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { delay, retry, tap } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
-import {
-  ApiResponse,
-  CreatePostPayload,
-  Post,
-  UpdatePostPayload,
-} from '../models/post.model';
+import { ApiResponse, CreatePostPayload, Post, UpdatePostPayload } from '../models/post.model';
+
+export interface PaginatedResponse<T> {
+  success: boolean;
+  message: string;
+  data: T[];
+  meta: { total: number; page: number; limit: number; totalPages: number; hasNext: boolean; hasPrev: boolean };
+}
 
 @Injectable({ providedIn: 'root' })
 export class PostsService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/posts`;
 
-  // delay: simula latencia minima para que los loading states sean visibles.
-  // retry: reintenta la peticion hasta 2 veces si falla (ej. cold start de Railway).
-  getAll(): Observable<ApiResponse<Post[]>> {
-    return this.http.get<ApiResponse<Post[]>>(this.baseUrl).pipe(
-      delay(150),
-      retry({ count: 2, delay: 1000 }),
-    );
+  getAll(page = 1, limit = 9): Observable<PaginatedResponse<Post>> {
+    return this.http
+      .get<PaginatedResponse<Post>>(this.baseUrl, { params: { page, limit } })
+      .pipe(delay(150), retry({ count: 2, delay: 1000 }));
   }
 
   getOne(id: string): Observable<ApiResponse<Post>> {
@@ -33,28 +32,24 @@ export class PostsService {
   create(payload: CreatePostPayload): Observable<ApiResponse<Post>> {
     return this.http
       .post<ApiResponse<Post>>(this.baseUrl, payload)
-      .pipe(tap(() => console.debug('[PostsService] Post creado')));
+      .pipe(tap(() => console.debug('[PostsService] Publicación creada')));
   }
 
   update(id: string, payload: UpdatePostPayload): Observable<ApiResponse<Post>> {
     return this.http
       .put<ApiResponse<Post>>(`${this.baseUrl}/${id}`, payload)
-      .pipe(tap(() => console.debug('[PostsService] Post actualizado:', id)));
+      .pipe(tap(() => console.debug('[PostsService] Publicación actualizada:', id)));
   }
 
   remove(id: string): Observable<ApiResponse<null>> {
     return this.http
       .delete<ApiResponse<null>>(`${this.baseUrl}/${id}`)
-      .pipe(tap(() => console.debug('[PostsService] Post eliminado:', id)));
+      .pipe(tap(() => console.debug('[PostsService] Publicación eliminada:', id)));
   }
 
-  bulkCreate(
-    posts: CreatePostPayload[],
-  ): Observable<{ success: boolean; message: string; data: { inserted: number; total: number } }> {
-    return this.http.post<{
-      success: boolean;
-      message: string;
-      data: { inserted: number; total: number };
-    }>(`${this.baseUrl}/bulk`, posts);
+  bulkCreate(posts: CreatePostPayload[]): Observable<{ success: boolean; message: string; data: { inserted: number; total: number } }> {
+    return this.http.post<{ success: boolean; message: string; data: { inserted: number; total: number } }>(
+      `${this.baseUrl}/bulk`, posts,
+    );
   }
 }

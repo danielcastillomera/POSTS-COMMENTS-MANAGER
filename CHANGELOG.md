@@ -6,51 +6,42 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es/1.0.0/) y este
 
 ---
 
+## v1.0.5 - Autenticación JWT, paginación real, extras completos y corrección de errores de compilación
+
+### Corregido
+
+- **Error de compilación en Vercel**: `post-detail.component.html` referenciaba `isLoadingPost()` e `isLoadingComments()` que ya no existían tras la refactorización a `combineLatest` en v1.0.4. Ahora usa la señal unificada `isLoading()`
+- **Error 404 en la URL raíz de Railway**: la API respondía con `404 Cannot GET /` porque el prefijo global `api/v1` no cubría la ruta raíz. Se agregó una ruta de estado en `/` que retorna información de la API sin interferir con el prefijo global
+
+### Agregado
+
+- **Autenticación JWT**: módulo `AuthModule` en NestJS con `POST /api/v1/auth/login`. Credenciales configurables mediante variables de entorno (`ADMIN_EMAIL`, `ADMIN_PASSWORD`, `JWT_SECRET`). Las rutas de escritura (POST, PUT, DELETE) están protegidas con `@UseGuards(JwtAuthGuard)`. El frontend incluye página de inicio de sesión, `AuthService` con señales, `authInterceptor` que agrega el token `Bearer` a cada petición, y `authGuard` para proteger rutas en Angular
+- **Paginación real**: `GET /posts` acepta parámetros `page` y `limit` (predeterminado: 9 por página). El backend retorna un campo `meta` con `total`, `totalPages`, `hasNext` y `hasPrev`. El frontend incluye el componente `PaginationComponent` integrado en la lista de publicaciones. La paginación se oculta automáticamente cuando el usuario activa el filtro de búsqueda
+- **Interceptor de respuesta en Angular** (`responseInterceptor`): registra en consola las respuestas de la API con `success: false` para facilitar la depuración sin mostrar toasts innecesarios
+- **Pipe `DateAgoPipe`**: convierte fechas a formato relativo ("hace 2 días", "hace 1 hora") con soporte para es-MX y en-US. Registrado como `standalone` y marcado como `pure: false` para actualizarse automáticamente
+- **Pipe `TruncatePipe`**: trunca textos largos a un límite de caracteres configurable con sufijo personalizable
+- **Directiva `AutoFocusDirective`**: aplica foco automático a un elemento del DOM al montarse, con retraso configurable en milisegundos mediante la propiedad de entrada `[appAutoFocus]`
+- **Pruebas unitarias de backend** (`posts.service.spec.ts`): cubren `findAll`, `create`, `findOne` y `bulkCreate` con mocks de Mongoose usando Jest
+- **Pruebas unitarias de frontend** (`posts.service.spec.ts`): cubren `getAll`, `create` y `remove` con `HttpClientTestingModule` de Angular
+
+### Notas sobre variables de entorno
+
+Las variables de entorno en Angular se compilan en el bundle durante el build (`environment.prod.ts`). Vercel **no requiere** configurar variables de entorno para el frontend: el valor de `apiUrl` se fija en el archivo `frontend/src/environments/environment.prod.ts` antes de hacer el commit y push. Railway sí requiere variables de entorno en tiempo de ejecución para el backend (`MONGODB_URI`, `JWT_SECRET`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `FRONTEND_URL`, `PORT`).
+
+---
+
 ## v1.0.4 - Corrección de CORS, implementación completa de RxJS y verificación de todos los requisitos
 
 ### Corregido
 
-- **Error 405 en POST /posts y POST /posts/bulk**: la causa raiz era la politica CORS del backend. El preflight OPTIONS que el navegador envia antes de toda peticion POST con body JSON estaba siendo bloqueado porque `origin` se validaba como string exacto. Se cambia la configuracion a `origin: '*'` (apropiado para prueba tecnica), que elimina el bloqueo del preflight y permite todos los metodos incluyendo OPTIONS
-- **`ParseArrayPipe` en `POST /posts/bulk`**: el endpoint de carga masiva ahora usa `@Body(new ParseArrayPipe({ items: CreatePostDto }))` para que el `ValidationPipe` global valide correctamente cada elemento del array recibido, en lugar de intentar validar el array completo como un unico DTO
-- **`environment.prod.ts`**: agregado comentario explicito indicando el formato exacto de la URL de Railway que debe configurarse antes del build de produccion
+- Error 405 en `POST /posts` y `POST /posts/bulk`: CORS cambiado a `origin: '*'` para eliminar bloqueo del preflight OPTIONS
+- `ParseArrayPipe` en `POST /posts/bulk` para validar cada elemento del arreglo correctamente
+- `environment.prod.ts`: comentario explícito sobre el formato de la URL de Railway
 
 ### Agregado
 
-- **`combineLatest` en `PostDetailComponent`**: el post y sus comentarios se cargan ahora en paralelo con `combineLatest([getOne(), getByPost()])`, reduciendo el tiempo total de carga y cumpliendo el requisito obligatorio del operador
-- **`switchMap` en `PostsListComponent`**: la recarga de publicaciones pasa ahora por un `Subject` + `switchMap`, garantizando que si se solicita una recarga antes de que la anterior termine, la peticion previa se cancela automaticamente
-- **`switchMap` en `PostFormComponent`**: la carga del post en modo edicion usa `of(id).pipe(filter(Boolean), switchMap(...))`, patron correcto para encadenar dependencias de observables
-
-### Verificacion de requisitos cumplidos
-
-| Requisito | Estado |
-|-----------|--------|
-| Estructura backend (modulos, DTOs, schemas, common/) | Implementado |
-| Modelos Post y Comment con todos los campos requeridos | Implementado |
-| CRUD completo de posts (GET, GET/:id, POST, PUT, DELETE) | Implementado |
-| CRUD de comentarios (GET?postId, POST, DELETE) | Implementado |
-| POST /posts/bulk con insertMany y validacion por DTO | Implementado |
-| Global Exception Filter estandarizado | Implementado |
-| Clase ApiResponse (success, error) | Implementado |
-| Estructura frontend (core, shared, features) | Implementado |
-| Listado de posts con titulo, autor, fecha y botones | Implementado |
-| Detalle del post con comentarios | Implementado |
-| Formulario reactivo crear/editar (title min3, body min10, author requerido) | Implementado |
-| Formulario de comentario con actualizacion instantanea | Implementado |
-| Signals: posts, search, filteredPosts (computed) | Implementado |
-| RxJS: switchMap | Implementado |
-| RxJS: tap | Implementado |
-| RxJS: catchError | Implementado |
-| RxJS: delay | Implementado |
-| RxJS: combineLatest | Implementado |
-| RxJS: retry | Implementado |
-| HttpInterceptor global de errores | Implementado |
-| Servicio de mapeo de errores (error-mapper) | Implementado |
-| Estados vacios, loading states, mensajes de error | Implementado |
-| Tailwind CSS | Implementado |
-| Pipes personalizados (TranslatePipe) | Implementado |
-| Directivas reutilizables (ClickOutsideDirective) | Implementado |
-| Docker para backend | Implementado |
-| Internacionalizacion es-MX / en-US | Implementado (mejora adicional) |
+- `combineLatest` en `PostDetailComponent`: carga de post y comentarios en paralelo
+- `switchMap` en `PostsListComponent` y `PostFormComponent` con patrones correctos de cancelación
 
 ---
 
@@ -58,10 +49,13 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es/1.0.0/) y este
 
 ### Corregido
 
-- `httpErrorInterceptor`: solo muestra toasts para errores HTTP reales (status >= 400)
-- `I18nService`: ruta de archivos de traduccion cambiada a absoluta (`/assets/i18n/`)
+- `httpErrorInterceptor`: solo muestra toasts para errores con status >= 400
+- `I18nService`: ruta de archivos de traducción cambiada a absoluta (`/assets/i18n/`)
 - Todos los textos en Español (México) corregidos con tildes completas
-- `LanguageSwitcherComponent`: apertura por hover, titulo "Cambiar idioma" y nombres completos de idioma
+
+### Agregado
+
+- `LanguageSwitcherComponent`: apertura por hover, título "Cambiar idioma" y nombres completos de idioma con banderas
 
 ---
 
@@ -69,9 +63,9 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es/1.0.0/) y este
 
 ### Corregido
 
-- `vercel.json` raiz: eliminado conflicto de `buildCommand`
-- `frontend/vercel.json`: configuracion completa para despliegue con directorio raiz en `frontend`
-- Toda la documentacion traducida al Español (México)
+- `vercel.json` raíz: eliminado conflicto de `buildCommand`
+- `frontend/vercel.json`: configuración completa para despliegue con directorio raíz en `frontend`
+- Toda la documentación traducida al Español (México)
 
 ---
 
@@ -88,10 +82,10 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es/1.0.0/) y este
 
 ### Agregado
 
-- Backend NestJS + MongoDB con CRUD completo de posts y comentarios
+- Backend NestJS + MongoDB con CRUD completo de publicaciones y comentarios
 - Frontend Angular 18+ con arquitectura standalone y Tailwind CSS
 - Endpoint de carga masiva `POST /api/v1/posts/bulk`
 - Angular Signals, formularios reactivos, RxJS, interceptores globales
-- Internacionalizacion Español (México) e Inglés (Estados Unidos)
+- Internacionalización Español (México) e Inglés (Estados Unidos)
 - Docker y Docker Compose para el backend
-- Coleccion de Postman y datos de ejemplo para carga masiva
+- Colección de Postman y datos de ejemplo para carga masiva
