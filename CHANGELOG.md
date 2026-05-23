@@ -6,27 +6,51 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es/1.0.0/) y este
 
 ---
 
+## v1.0.6 - Configuración en tiempo de ejecución, corrección de rutas API y compatibilidad con Dependabot
+
+### Corregido
+
+- **Error "Cannot GET /posts", "Cannot POST /auth/login", "Cannot POST /posts/bulk"**: la causa raíz era que `apiUrl` no incluía el prefijo `/api/v1`. Se implementa `ConfigService` que carga `/assets/config.json` en tiempo de ejecución. Ahora el usuario solo edita `frontend/src/assets/config.json` con su URL de Railway (incluyendo `/api/v1`) sin necesidad de recompilar. Si el archivo no está configurado, el servicio usa `environment.apiUrl` como respaldo
+- **Error de Dependabot en Vercel** (`ERESOLVE unable to resolve dependency tree`): Dependabot actualizó `@angular/common` a v21 mientras `@angular/core` permanecía en v18, rompiendo la resolución de dependencias. Se agrega `.github/dependabot.yml` que agrupa todos los paquetes `@angular*` en una sola actualización y bloquea cambios de versión mayor y menor para Angular y NestJS
+- **Creación de comentarios sin autenticación**: `POST /comments` era incorrecto al requerir JWT. Los comentarios los crea cualquier visitante; solo la eliminación (`DELETE /comments/:id`) requiere sesión de administrador
+
+### Agregado
+
+- **`ConfigService`** (`core/services/config.service.ts`): servicio de configuración en tiempo de ejecución que carga `assets/config.json` antes de cualquier petición al API. Detecta y descarta valores de ejemplo (`REEMPLAZA-CON-TU-URL`) para usar siempre un valor válido
+- **`assets/config.json`**: archivo de configuración editable sin rebuild que contiene la `apiUrl`. Es el único archivo que el usuario debe actualizar al desplegar en Vercel
+- **`.github/dependabot.yml`**: configuración de Dependabot con agrupación de paquetes Angular y NestJS y restricción a actualizaciones de parche únicamente
+
+### Pasos para configurar tras el despliegue
+
+1. Obtener la URL pública del backend en Railway > tu servicio > **Settings** > **Networking**
+2. Editar `frontend/src/assets/config.json`:
+   ```json
+   { "apiUrl": "https://tu-servicio.up.railway.app/api/v1" }
+   ```
+3. Agregar en Railway las variables de entorno para JWT:
+   - `JWT_SECRET` → cadena aleatoria de al menos 32 caracteres
+   - `JWT_EXPIRES_IN` → `24h`
+   - `ADMIN_EMAIL` → correo del administrador
+   - `ADMIN_PASSWORD` → contraseña del administrador
+4. Hacer commit y push. Vercel redespliega automáticamente
+
+---
+
 ## v1.0.5 - Autenticación JWT, paginación real, extras completos y corrección de errores de compilación
 
 ### Corregido
 
-- **Error de compilación en Vercel**: `post-detail.component.html` referenciaba `isLoadingPost()` e `isLoadingComments()` que ya no existían tras la refactorización a `combineLatest` en v1.0.4. Ahora usa la señal unificada `isLoading()`
-- **Error 404 en la URL raíz de Railway**: la API respondía con `404 Cannot GET /` porque el prefijo global `api/v1` no cubría la ruta raíz. Se agregó una ruta de estado en `/` que retorna información de la API sin interferir con el prefijo global
+- **Error de compilación en Vercel**: `post-detail.component.html` referenciaba `isLoadingPost()` e `isLoadingComments()` que ya no existían. Ahora usa la señal unificada `isLoading()`
+- **Error 404 en la URL raíz de Railway**: se agregó ruta de estado en `/` que retorna información de la API
 
 ### Agregado
 
-- **Autenticación JWT**: módulo `AuthModule` en NestJS con `POST /api/v1/auth/login`. Credenciales configurables mediante variables de entorno (`ADMIN_EMAIL`, `ADMIN_PASSWORD`, `JWT_SECRET`). Las rutas de escritura (POST, PUT, DELETE) están protegidas con `@UseGuards(JwtAuthGuard)`. El frontend incluye página de inicio de sesión, `AuthService` con señales, `authInterceptor` que agrega el token `Bearer` a cada petición, y `authGuard` para proteger rutas en Angular
-- **Paginación real**: `GET /posts` acepta parámetros `page` y `limit` (predeterminado: 9 por página). El backend retorna un campo `meta` con `total`, `totalPages`, `hasNext` y `hasPrev`. El frontend incluye el componente `PaginationComponent` integrado en la lista de publicaciones. La paginación se oculta automáticamente cuando el usuario activa el filtro de búsqueda
-- **Interceptor de respuesta en Angular** (`responseInterceptor`): registra en consola las respuestas de la API con `success: false` para facilitar la depuración sin mostrar toasts innecesarios
-- **Pipe `DateAgoPipe`**: convierte fechas a formato relativo ("hace 2 días", "hace 1 hora") con soporte para es-MX y en-US. Registrado como `standalone` y marcado como `pure: false` para actualizarse automáticamente
-- **Pipe `TruncatePipe`**: trunca textos largos a un límite de caracteres configurable con sufijo personalizable
-- **Directiva `AutoFocusDirective`**: aplica foco automático a un elemento del DOM al montarse, con retraso configurable en milisegundos mediante la propiedad de entrada `[appAutoFocus]`
-- **Pruebas unitarias de backend** (`posts.service.spec.ts`): cubren `findAll`, `create`, `findOne` y `bulkCreate` con mocks de Mongoose usando Jest
-- **Pruebas unitarias de frontend** (`posts.service.spec.ts`): cubren `getAll`, `create` y `remove` con `HttpClientTestingModule` de Angular
-
-### Notas sobre variables de entorno
-
-Las variables de entorno en Angular se compilan en el bundle durante el build (`environment.prod.ts`). Vercel **no requiere** configurar variables de entorno para el frontend: el valor de `apiUrl` se fija en el archivo `frontend/src/environments/environment.prod.ts` antes de hacer el commit y push. Railway sí requiere variables de entorno en tiempo de ejecución para el backend (`MONGODB_URI`, `JWT_SECRET`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `FRONTEND_URL`, `PORT`).
+- Autenticación JWT completa (backend + frontend)
+- Paginación real con 9 publicaciones por página y componente `PaginationComponent`
+- Interceptor de respuesta en Angular (`responseInterceptor`)
+- Pipes `DateAgoPipe` y `TruncatePipe`
+- Directiva `AutoFocusDirective`
+- Pruebas unitarias en backend (Jest) y frontend (Karma)
 
 ---
 
@@ -34,14 +58,13 @@ Las variables de entorno en Angular se compilan en el bundle durante el build (`
 
 ### Corregido
 
-- Error 405 en `POST /posts` y `POST /posts/bulk`: CORS cambiado a `origin: '*'` para eliminar bloqueo del preflight OPTIONS
-- `ParseArrayPipe` en `POST /posts/bulk` para validar cada elemento del arreglo correctamente
-- `environment.prod.ts`: comentario explícito sobre el formato de la URL de Railway
+- Error 405 en `POST /posts` y `POST /posts/bulk`: CORS cambiado a `origin: '*'`
+- `ParseArrayPipe` en `POST /posts/bulk` para validar cada elemento del arreglo
 
 ### Agregado
 
-- `combineLatest` en `PostDetailComponent`: carga de post y comentarios en paralelo
-- `switchMap` en `PostsListComponent` y `PostFormComponent` con patrones correctos de cancelación
+- `combineLatest` en `PostDetailComponent`
+- `switchMap` en `PostsListComponent` y `PostFormComponent`
 
 ---
 
@@ -50,12 +73,12 @@ Las variables de entorno en Angular se compilan en el bundle durante el build (`
 ### Corregido
 
 - `httpErrorInterceptor`: solo muestra toasts para errores con status >= 400
-- `I18nService`: ruta de archivos de traducción cambiada a absoluta (`/assets/i18n/`)
-- Todos los textos en Español (México) corregidos con tildes completas
+- `I18nService`: ruta de archivos de traducción cambiada a absoluta
+- Todos los textos en Español (México) corregidos con tildes
 
 ### Agregado
 
-- `LanguageSwitcherComponent`: apertura por hover, título "Cambiar idioma" y nombres completos de idioma con banderas
+- `LanguageSwitcherComponent`: apertura por hover, título y nombres completos de idioma con banderas
 
 ---
 
@@ -63,8 +86,7 @@ Las variables de entorno en Angular se compilan en el bundle durante el build (`
 
 ### Corregido
 
-- `vercel.json` raíz: eliminado conflicto de `buildCommand`
-- `frontend/vercel.json`: configuración completa para despliegue con directorio raíz en `frontend`
+- `vercel.json`: eliminado conflicto de `buildCommand`
 - Toda la documentación traducida al Español (México)
 
 ---
@@ -74,7 +96,6 @@ Las variables de entorno en Angular se compilan en el bundle durante el build (`
 ### Corregido
 
 - `backend/Dockerfile`: reemplazado `npm ci` por `npm install --omit=dev`
-- Generado `backend/package-lock.json` para instalaciones reproducibles
 
 ---
 

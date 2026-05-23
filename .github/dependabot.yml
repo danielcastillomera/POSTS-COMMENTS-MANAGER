@@ -1,0 +1,34 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    schedule:
+      interval: "monthly"
+    groups:
+      angular:
+        patterns:
+          - "@angular*"
+          - "@angular-devkit/*"
+          - "zone.js"
+          - "tslib"
+    ignore:
+      - dependency-name: "@angular*"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      - dependency-name: "@angular-devkit/*"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      - dependency-name: "tailwindcss"
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: "npm"
+    directory: "/backend"
+    schedule:
+      interval: "monthly"
+    groups:
+      nestjs:
+        patterns:
+          - "@nestjs/*"
+    ignore:
+      - dependency-name: "@nestjs/*"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      - dependency-name: "mongoose"
+        update-types: ["version-update:semver-major"]

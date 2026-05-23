@@ -18,18 +18,20 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
 
+  // GET es publico - cualquier visitante puede leer los comentarios
   @Get()
   findByPost(@Query('postId') postId: string) {
     return this.commentsService.findByPost(postId);
   }
 
-  @UseGuards(JwtAuthGuard)
+  // POST es publico - cualquier visitante puede agregar un comentario
   @Post()
   @HttpCode(HttpStatus.CREATED)
   create(@Body() dto: CreateCommentDto) {
     return this.commentsService.create(dto);
   }
 
+  // DELETE requiere autenticacion - solo administradores eliminan comentarios
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
   @HttpCode(HttpStatus.OK)

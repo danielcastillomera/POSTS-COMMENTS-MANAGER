@@ -2,8 +2,8 @@ import { inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
-import { tap, map } from 'rxjs/operators';
-import { environment } from '../../../../environments/environment';
+import { map, tap } from 'rxjs/operators';
+import { ConfigService } from '../../../core/services/config.service';
 
 interface LoginResponse {
   success: boolean;
@@ -13,8 +13,9 @@ interface LoginResponse {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly http = inject(HttpClient);
+  private readonly http   = inject(HttpClient);
   private readonly router = inject(Router);
+  private readonly config = inject(ConfigService);
   private readonly TOKEN_KEY = 'auth_token';
   private readonly _isAuthenticated = signal(false);
 
@@ -26,7 +27,7 @@ export class AuthService {
 
   login(email: string, password: string): Observable<void> {
     return this.http
-      .post<LoginResponse>(`${environment.apiUrl}/auth/login`, { email, password })
+      .post<LoginResponse>(`${this.config.apiUrl}/auth/login`, { email, password })
       .pipe(
         tap((res) => {
           localStorage.setItem(this.TOKEN_KEY, res.data.token);

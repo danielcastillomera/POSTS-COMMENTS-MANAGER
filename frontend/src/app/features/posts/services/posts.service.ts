@@ -2,20 +2,31 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { delay, retry, tap } from 'rxjs/operators';
-import { environment } from '../../../../environments/environment';
+import { ConfigService } from '../../../core/services/config.service';
 import { ApiResponse, CreatePostPayload, Post, UpdatePostPayload } from '../models/post.model';
 
 export interface PaginatedResponse<T> {
   success: boolean;
   message: string;
   data: T[];
-  meta: { total: number; page: number; limit: number; totalPages: number; hasNext: boolean; hasPrev: boolean };
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  };
 }
 
 @Injectable({ providedIn: 'root' })
 export class PostsService {
-  private readonly http = inject(HttpClient);
-  private readonly baseUrl = `${environment.apiUrl}/posts`;
+  private readonly http   = inject(HttpClient);
+  private readonly config = inject(ConfigService);
+
+  private get baseUrl(): string {
+    return `${this.config.apiUrl}/posts`;
+  }
 
   getAll(page = 1, limit = 9): Observable<PaginatedResponse<Post>> {
     return this.http
@@ -47,9 +58,13 @@ export class PostsService {
       .pipe(tap(() => console.debug('[PostsService] Publicación eliminada:', id)));
   }
 
-  bulkCreate(posts: CreatePostPayload[]): Observable<{ success: boolean; message: string; data: { inserted: number; total: number } }> {
-    return this.http.post<{ success: boolean; message: string; data: { inserted: number; total: number } }>(
-      `${this.baseUrl}/bulk`, posts,
-    );
+  bulkCreate(
+    posts: CreatePostPayload[],
+  ): Observable<{ success: boolean; message: string; data: { inserted: number; total: number } }> {
+    return this.http.post<{
+      success: boolean;
+      message: string;
+      data: { inserted: number; total: number };
+    }>(`${this.baseUrl}/bulk`, posts);
   }
 }

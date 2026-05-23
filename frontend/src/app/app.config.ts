@@ -7,9 +7,13 @@ import { httpErrorInterceptor } from './core/interceptors/http-error.interceptor
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { responseInterceptor } from './core/interceptors/response.interceptor';
 import { I18nService } from './core/services/i18n.service';
+import { ConfigService } from './core/services/config.service';
 
-function initializeI18n(i18n: I18nService) {
-  return () => i18n.initialize();
+function initializeApp(config: ConfigService, i18n: I18nService) {
+  return async () => {
+    await config.load();    // 1. Carga /assets/config.json con la URL del API
+    await i18n.initialize(); // 2. Carga /assets/i18n/{lang}.json
+  };
 }
 
 export const appConfig: ApplicationConfig = {
@@ -18,12 +22,17 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes, withComponentInputBinding()),
     provideHttpClient(
       withInterceptors([
-        authInterceptor,      // 1. Agrega Bearer token si existe
-        responseInterceptor,  // 2. Registra respuestas en consola
-        httpErrorInterceptor, // 3. Muestra toast solo para errores >= 400
+        authInterceptor,
+        responseInterceptor,
+        httpErrorInterceptor,
       ]),
     ),
     provideAnimations(),
-    { provide: APP_INITIALIZER, useFactory: initializeI18n, deps: [I18nService], multi: true },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initializeApp,
+      deps: [ConfigService, I18nService],
+      multi: true,
+    },
   ],
 };
